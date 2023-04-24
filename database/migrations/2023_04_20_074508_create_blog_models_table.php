@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigInteger('user_id');
             $table->string('title',100);
             $table->longText('content');
+            $table->string('thumbnail');
             $table->integer('like_count')->nullable();
             $table->integer('comment_count')->nullable();
             $table->timestamp('date_start')->nullable();
