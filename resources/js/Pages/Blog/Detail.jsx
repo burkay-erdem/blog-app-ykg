@@ -6,6 +6,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import Moment from 'moment';
+import Guest from '@/Layouts/GuestLayout';
 
 const initialState = {
     name: '',
@@ -14,10 +15,9 @@ const initialState = {
     password_confirmation: '',
 }
 export default function Detail({ auth, blog }) {
-    console.log('blog: ', blog);
-    Moment.locale('en');
+    const Layout = auth.user ? AuthenticatedLayout : Guest
     return (
-        <AuthenticatedLayout
+        <Layout
             user={auth.user}
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Blog Detail</h2>}
         >
@@ -43,6 +43,6 @@ export default function Detail({ auth, blog }) {
             </div>
 
 
-        </AuthenticatedLayout>
+        </Layout>
     );
 }

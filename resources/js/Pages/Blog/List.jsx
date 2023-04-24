@@ -53,8 +53,11 @@ export default function List({ auth, blogs }) {
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">My Blogs</h2>}
         >
             <Head title="My Blogs" />
+
             <div className="py-3" >
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <a className="bg-indigo-500 block font-bold hover:bg-gray-500 px-2 py-1 rounded text-center text-gray-100" href={route('blog.create')}> Create new  blog </a>
+
                     {
                         blogs.data.map((blog) => (
                             <div className="py-3" key={blog.blog_id}>
@@ -64,7 +67,7 @@ export default function List({ auth, blogs }) {
                                             <span className="font-light text-gray-600"> {Moment(blog.created_at).format('DD MMM YYYY - dddd')} </span>
                                             <div>
                                                 <DangerButton className="hover:bg-gray-500 mx-3" onClick={() => handleDelete(blog.blog_id)}> Delete </DangerButton>
-                                                <a className="px-2 py-1 bg-gray-600 text-gray-100 font-bold rounded hover:bg-gray-500" href={`/blog/${blog.blog_id}/edit`}> Edit </a>
+                                                <a className="px-2 py-1 bg-gray-600 text-gray-100 font-bold rounded hover:bg-gray-500" href={route('blog.edit',{id: blog.blog_id})}> Edit </a>
                                             </div>
 
                                         </div>

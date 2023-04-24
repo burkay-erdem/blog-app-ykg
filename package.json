@@ -19,8 +19,10 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "dayjs": "^1.11.7",
         "draft-convert": "^2.1.13",
         "draft-js": "^0.11.7",
+        "immutable": "^4.3.0",
         "moment": "^2.29.4",
         "react-draft-wysiwyg": "^1.15.0",
         "react-tailwindcss-datepicker": "^1.6.0"

@@ -14,16 +14,16 @@ import Checkbox from '@/Components/Checkbox';
 import Datepicker from "react-tailwindcss-datepicker";
 import Moment from 'moment';
 export default function Form({ auth, blog }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        title: blog.title ?? '',
-        tag: blog.tag ?? '',
-        content: blog.content ?? '',
-        thumbnail: blog.thumbnail ?? '',
-        date_start: blog.date_start ?? '',
-        date_end: blog.date_end ?? '',
+    const { data, setData, post, processing, errors, reset, patch, put } = useForm({
+        title: blog?.title ?? '',
+        tag: blog?.tag ?? '',
+        content: blog?.content ?? '',
+        thumbnail: blog?.thumbnail ?? '',
+        date_start: blog?.date_start ?? '',
+        date_end: blog?.date_end ?? '',
     });
 
-    const _contentState = ContentState.createFromText(blog.content);
+    const _contentState = ContentState.createFromText(data.content);
     const raw = convertToRaw(_contentState);  // RawDraftContentState JSON
     const [contentState, setContentState] = useState(raw);
     const [editorState, setEditorState] = useState(
@@ -43,7 +43,13 @@ export default function Form({ auth, blog }) {
     const submit = (e) => {
         e.preventDefault();
         if (blog) {
-            post(`blog/${blog.blog_id}`);
+            put(route('blog.update', { id: blog.blog_id }), {
+                onSuccess: () => reset(),
+                onError: (errors) => {
+                    console.log('errors: ', errors);
+                },
+            });
+            // put(route('blog.update', { id: blog.blog_id }));
         } else {
             post(route('blog.store'))
         }
@@ -105,23 +111,22 @@ export default function Form({ auth, blog }) {
                         <InputLabel htmlFor="startDate" value="Start Date" />
                         <Datepicker
                             primaryColor={"yellow"}
-                            value={{ startDate: Moment(data.date_start), endDate: Moment(data.date_start)}}
+                            value={{ startDate: Moment(data.date_start), endDate: Moment(data.date_start) }}
                             asSingle={true}
-                            minDate={Moment().add(-1,'days')}
+                            minDate={Moment().add(-1, 'days')}
                             classNames={"light"}
-                            onChange={e => setData('date_start',e.startDate)}
+                            onChange={e => setData('date_start', e.startDate)}
                         />
                     </div>
                     <div className='my-3'>
                         <InputLabel htmlFor="endDate" value="End Date" />
-
                         <Datepicker
                             primaryColor={"yellow"}
-                            value={{ startDate: Moment(data.date_end), endDate: Moment(data.date_end)}}
+                            value={{ startDate: Moment(data.date_end), endDate: Moment(data.date_end) }}
                             asSingle={true}
                             minDate={data.date_start}
                             classNames={"light"}
-                            onChange={e => setData('date_end',e.endDate)}
+                            onChange={e => setData('date_end', e.endDate)}
                         />
                     </div>
                     <div className="flex items-center justify-end mt-4">

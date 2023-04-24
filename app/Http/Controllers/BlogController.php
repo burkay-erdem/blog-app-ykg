@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect; 
+use Illuminate\Support\Facades\Redirect;
 
 class BlogController extends Controller
 {
@@ -45,26 +45,29 @@ class BlogController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Blog/Form');
+        return Inertia::render('Blog/Form', [
+            'status' => session('status'), 
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBlogRequest $request): Response
+    public function store(StoreBlogRequest $request): RedirectResponse
     {
 
-        return response([
-            'status' => true,
-            'message' => 'create new blog',
-            'result' => $request
+        $request->validate([
+            'title' => 'required',
+            'content' => 'required', 
         ]);
-        $blog = BlogModel::create([
-            'first_name' => 'Taylor',
-            'last_name' => 'Otwell',
-            'title' => 'Developer',
-        ]);
-        //
+        $insert_data = [
+            ...$request->post(),
+            'user_id' => $request->user()->user_id
+        ];
+       
+        BlogModel::create($insert_data);
+        return Redirect::route('blog.index');
+     
     }
 
     /**
@@ -97,20 +100,26 @@ class BlogController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBlogRequest $request, BlogModel $blogModel)
-    {
-        //
+    public function update(UpdateBlogRequest $request, BlogModel $blog): RedirectResponse
+    {  
+        $request->validate([
+            'title' => 'required',
+            'content' => 'required', 
+        ]);
+       
+        $blog->fill($request->post())->save();
+        return Redirect::route('blog.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(BlogModel $blog,Request $request): RedirectResponse
+    public function destroy(BlogModel $blog, Request $request): RedirectResponse
     {
         $request->validate([
             'password' => ['required', 'current_password'],
         ]);
- 
+
 
         $blog->delete();
 

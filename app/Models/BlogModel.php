@@ -10,7 +10,15 @@ class BlogModel extends Model
 {
     use HasFactory;
     protected $primaryKey = 'blog_id';
+    protected $table = 'blogs';
 
+    protected $fillable = [ 
+        'tag',
+        'title',
+        'content',
+        'date_start',
+        'date_end',
+    ];
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
