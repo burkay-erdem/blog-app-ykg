@@ -1,9 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Guest from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react';
-
+import Moment from 'moment';
 export default function Welcome({ auth, blogs }) {
-    console.log('auth: ', auth);
+    console.log('blogs: ', blogs);
     const Layout = auth.user ? AuthenticatedLayout : Guest
     return (
 
@@ -15,20 +15,31 @@ export default function Welcome({ auth, blogs }) {
             <div className="py-3" >
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     {
-                        blogs && blogs.data.map(blog => (
+                        blogs.data.map((blog) => (
                             <div className="py-3" key={blog.blog_id}>
-                                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                                        <div className="p-6 text-gray-900">{blog.title}</div>
-                                    </div>
-                                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                                        <div className="p-6 text-gray-900">{blog.content}</div>
+                                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8" >
+                                    <div className="max-w-4xl px-10 py-6 bg-white rounded-lg shadow-md " >
+                                        <div className="flex justify-between items-center">
+                                            <span className="font-light text-gray-600"> {Moment(blog.created_at).format('DD MMM YYYY - dddd')} </span>
+                                            <a className="px-2 py-1 bg-gray-600 text-gray-100 font-bold rounded hover:bg-gray-500" href="#"> {blog.tag} </a>
+                                        </div>
+                                        <div className="mt-2">
+                                            <a className="text-2xl text-gray-700 font-bold hover:underline" href="#"> {blog.title} </a>
+                                        </div>
+                                        <div className="flex justify-between items-center mt-4">
+                                            <a className="text-blue-500 hover:underline" href={route('blog.detail', { blog_id: blog.blog_id })}>Read more</a>
+                                            <div>
+                                                <a className="flex items-center" href="#">
+                                                    <img className="mx-4 w-10 h-10 object-cover rounded-full hidden sm:block" src={blog.user.thumbnail} alt="avatar" />
+                                                    <h1 className="text-gray-700 font-bold hover:underline"> {blog.user.name} </h1>
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         ))
                     }
-
 
 
                     <div className='isolate inline-flex -space-x-px rounded-md shadow-sm'>

@@ -6,26 +6,35 @@ use App\Models\BlogModel;
 use App\Http\Requests\StoreBlogRequest;
 use App\Http\Requests\UpdateBlogRequest;
 use App\Http\Resources\BlogResource;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect; 
 
 class BlogController extends Controller
 {
+    private $pagination_limit = 5;
 
     public function blogs(Request $request): Response
     {
-        $blogs =  BlogModel::paginate(2);
+        $blogs =  BlogModel::query()
+            ->with('user')
+            ->paginate($this->pagination_limit);
+
         return Inertia::render('Welcome', [
             'status' => session('status'),
             'blogs' =>  $blogs
         ]);
     }
 
-    public function myBlogs(Request $request): Response
+    public function index(Request $request): Response
     {
-        $blogs =  BlogModel::where('user_id', $request->user()->user_id)->paginate(2);
+        $blogs =  BlogModel::where('user_id', $request->user()->user_id)->paginate($this->pagination_limit);
+
+
         return Inertia::render('Blog/List', [
             'status' => session('status'),
             'blogs' =>  $blogs
@@ -42,7 +51,7 @@ class BlogController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBlogRequest $request)
+    public function store(StoreBlogRequest $request): Response
     {
 
         return response([
@@ -61,8 +70,14 @@ class BlogController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(BlogModel $blogModel)
+    public function show(Request $request): Response
     {
+        $blog = BlogModel::where('blog_id', $request->get('blog_id'))->with('user')->first();
+
+        return Inertia::render('Blog/Detail', [
+            'status' => session('status'),
+            'blog' => $blog
+        ]);
 
         //
     }
@@ -70,8 +85,12 @@ class BlogController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(BlogModel $blogModel)
+    public function edit(BlogModel $blog)
     {
+        return Inertia::render('Blog/Form', [
+            'status' => session('status'),
+            'blog' => $blog
+        ]);
         //
     }
 
@@ -86,8 +105,15 @@ class BlogController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(BlogModel $blogModel)
+    public function destroy(BlogModel $blog,Request $request): RedirectResponse
     {
-        //
+        $request->validate([
+            'password' => ['required', 'current_password'],
+        ]);
+ 
+
+        $blog->delete();
+
+        return Redirect::route('blog.index');
     }
 }

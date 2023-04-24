@@ -17,9 +17,10 @@ class BlogModelFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->title(), 
+            'title' => fake()->text(50), 
             'content' => fake()->text(),
             'date_start' => now(),
+            'tag' => fake()->text(5),
             'thumbnail' => fake()->imageUrl(),
             'date_end' => now()->addDays(1),
             'like_count' => fake()->randomNumber(),

@@ -20,13 +20,13 @@ use Inertia\Inertia;
 Route::get('/', [BlogController::class, 'blogs'])->name('home');
  
 Route::get('/blogs', [BlogController::class, 'blogs'])->name('blogs');
+Route::get('/blog/detail', [BlogController::class, 'show'])->name('blog.detail');
 
 
 
 
-Route::middleware('auth')->group(function () {
-    Route::get('/myBlogs', [BlogController::class, 'myBlogs'])->name('blog.blogs');
-    // Route::resource('blog', BlogController::class);
+Route::middleware('auth')->group(function () { 
+    Route::resource('blog', BlogController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

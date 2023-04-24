@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('blog_id');
             $table->bigInteger('user_id');
             $table->string('title',100);
+            $table->string('tag',20);
             $table->longText('content');
             $table->string('thumbnail');
             $table->integer('like_count')->nullable();
