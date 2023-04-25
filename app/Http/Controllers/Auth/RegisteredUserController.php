@@ -43,9 +43,14 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'thumbnail' => fake()->imageUrl()
+            'thumbnail' => fake()->imageUrl(
+                public_path("faker"),
+                100,
+                100
+            )
         ]);
-
+        $role = Role::firstOrCreate(['name' => 'Blogger']);
+        $user->assignRole($role->name);
         event(new Registered($user));
 
         Auth::login($user);

@@ -21,7 +21,10 @@ class BlogModelFactory extends Factory
             'content' => fake()->text(),
             'date_start' => now(),
             'tag' => fake()->text(5),
-            'thumbnail' => fake()->imageUrl(),
+            'thumbnail' => fake()->imageUrl(
+                640,
+                360
+            ),
             'date_end' => now()->addDays(1),
             'like_count' => fake()->randomNumber(),
             'comment_count' => fake()->randomNumber()

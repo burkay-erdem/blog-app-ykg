@@ -7,8 +7,8 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import Moment from 'moment';
 import Guest from '@/Layouts/GuestLayout';
-import CommentForm from './CommentForm';
-import CommentList from './CommentList';
+import CommentForm from './Components/CommentForm';
+import CommentList from './Components/CommentList';
 
 const initialState = {
     name: '',

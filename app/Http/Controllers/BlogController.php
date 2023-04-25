@@ -21,6 +21,14 @@ class BlogController extends Controller
 {
     private $pagination_limit = 5;
 
+
+    protected function permissions($permitionName): bool
+    {
+        if (Auth::user()) {
+            return Auth::user()->hasPermissionTo($permitionName);
+        }
+        return false;
+    }
     public function blogs(Request $request): Response
     {
         $blogs =  BlogModel::query()
@@ -29,7 +37,7 @@ class BlogController extends Controller
             ->paginate($this->pagination_limit);
 
         return Inertia::render('Welcome', [
-            'status' => session('status'),
+            'isAdmin' =>  $this->permissions('Admin'),
             'blogs' =>  $blogs
         ]);
     }
@@ -37,11 +45,13 @@ class BlogController extends Controller
     public function index(Request $request): Response
     {
         $blogs =  BlogModel::where('user_id', $request->user()->user_id)
+            ->with('user')
             ->orderBy('created_at', 'desc')
             ->paginate($this->pagination_limit);
 
         return Inertia::render('Blog/List', [
-            'status' => session('status'),
+            'isAdmin' =>  $this->permissions('Admin'),
+            'isBlogger' =>  $this->permissions('Blogger'),
             'blogs' =>  $blogs
         ]);
     }
@@ -50,9 +60,7 @@ class BlogController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Blog/Form', [
-            'status' => session('status'),
-        ]);
+        return Inertia::render('Blog/Form');
     }
 
     /**
@@ -88,15 +96,16 @@ class BlogController extends Controller
      */
     public function show(Request $request): Response
     {
+
         $blog = BlogModel::where('blog_id', $request->get('blog_id'))
-        ->with('user')
-        ->with(['comments' => function ($q) {
-            $q->with('user')->orderBy('created_at','desc');
-        }])
-        ->first();
+            ->with('user')
+            ->with(['comments' => function ($q) {
+                $q->with('user')->orderBy('created_at', 'desc');
+            }])
+            ->first();
 
         return Inertia::render('Blog/Detail', [
-            'status' => session('status'),
+            'isAdmin' =>  $this->permissions('Admin'),
             'blog' => $blog
         ]);
 
@@ -109,10 +118,8 @@ class BlogController extends Controller
     public function edit(BlogModel $blog)
     {
         return Inertia::render('Blog/Form', [
-            'status' => session('status'),
             'blog' => $blog
         ]);
-        //
     }
 
     /**
@@ -158,7 +165,7 @@ class BlogController extends Controller
 
         $blog->delete();
 
-        return Redirect::route('blog.index');
+        return Redirect::back();
     }
 
 
@@ -171,6 +178,6 @@ class BlogController extends Controller
         ])->validate();
 
         CommentModel::create($request->post());
-        return Redirect::route('blog.detail',['blog_id' => $request->post('blog_id')]);
+        return Redirect::route('blog.detail', ['blog_id' => $request->post('blog_id')]);
     }
 }
