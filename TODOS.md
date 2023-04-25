@@ -20,4 +20,4 @@
 
 [x] - Adminin tüm blagları silebilme yetkisi
 
-[] - Kullanıcı engelleme işlemi
+[x] - Kullanıcı engelleme işlemi
