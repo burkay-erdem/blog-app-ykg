@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
-    private $user = null;
+    private $user = null; 
     private $role = null;
     /**
      * Seed the application's database.
@@ -55,6 +55,7 @@ class DatabaseSeeder extends Seeder
             $this->user->assignRole($this->role->name);
 
             BlogModel::factory(fake()->randomNumber(1))->create(['user_id' => $user->user_id])->each(function ($blog) {
+
                 CommentModel::factory(fake()->randomNumber(1))->create([
                     'user_id' => $this->user->user_id,
                     'blog_id' => $blog->blog_id

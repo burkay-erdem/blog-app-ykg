@@ -30,4 +30,11 @@ class BlogModel extends Model
     {
         return $this->hasMany(CommentModel::class, 'blog_id');
     }
+    public function likes(): HasMany
+    {
+        return $this->hasMany(LikeModel::class, 'blog_id');
+    }
+    public function myLike() {
+        return $this->hasMany(LikeModel::class, 'blog_id');
+    }
 }

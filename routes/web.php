@@ -34,6 +34,8 @@ Route::middleware(['auth'])->group(function () {
     
     Route::post('/blog/{blog}/update', [BlogController::class, 'update'])->name('blog.update');
     Route::post('/comment', [BlogController::class, 'comment'])->name('comment.store');
+    Route::post('/like', [BlogController::class, 'like'])->name('like.store');
+    Route::delete('/like/{like}', [BlogController::class, 'unLike'])->name('like.destroy');
     Route::resource('blog', BlogController::class)->except(['update']);
 
 });

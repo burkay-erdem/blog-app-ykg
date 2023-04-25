@@ -7,6 +7,7 @@ use App\Http\Requests\StoreBlogRequest;
 use App\Http\Requests\UpdateBlogRequest;
 use App\Http\Resources\BlogResource;
 use App\Models\CommentModel;
+use App\Models\LikeModel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -97,10 +98,18 @@ class BlogController extends Controller
     public function show(Request $request): Response
     {
 
+        $user_id = 0;
+        if ($request->user()) {
+            $user_id = $request->user()->user_id;
+        }
         $blog = BlogModel::where('blog_id', $request->get('blog_id'))
             ->with('user')
-            ->with(['comments' => function ($q) {
-                $q->with('user')->orderBy('created_at', 'desc');
+            ->with(['comments' => function ($query) {
+                $query->with('user')->orderBy('created_at', 'desc');
+            }])
+            ->withCount('likes')
+            ->with(['myLike' => function ($query) use ($user_id) {
+                $query->where('user_id',$user_id);
             }])
             ->first();
 
@@ -179,5 +188,23 @@ class BlogController extends Controller
 
         CommentModel::create($request->post());
         return Redirect::route('blog.detail', ['blog_id' => $request->post('blog_id')]);
+    }
+
+    public function like(Request $request): RedirectResponse
+    {
+        Validator::make($request->post(), [
+            'user_id' => ['required'],
+            'blog_id' => ['required'],
+        ])->validate();
+
+        LikeModel::create($request->post());
+        return Redirect::back();
+    }
+
+
+    public function unLike(Request $request, LikeModel $like): RedirectResponse
+    {
+        $like->delete();
+        return Redirect::back();
     }
 }

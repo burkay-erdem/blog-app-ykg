@@ -50,4 +50,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(BlogModel::class, 'user_id');
     }
+    public function comments(): HasMany
+    {
+        return $this->hasMany(CommentModel::class, 'user_id');
+    }
+    public function likes(): HasMany
+    {
+        return $this->hasMany(LikeModel::class, 'user_id');
+    }
 }
