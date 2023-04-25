@@ -4,19 +4,30 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { Transition } from '@headlessui/react';
+import FileInput from '@/Components/FileInput';
+import { useState } from 'react';
 
 export default function UpdateProfileInformation({ mustVerifyEmail, status, className = '' }) {
     const user = usePage().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful,post } = useForm({
+    const { data, setData, errors, processing, recentlySuccessful, post } = useForm({
         name: user.name,
         email: user.email,
+        thumbnail: user.thumbnail
     });
+    const [preview, setPreview] = useState(user.thumbnail);
 
+    const uploadThumbnail = (e) => {
+        if (e.target.files.length > 0) {
+            const src = URL.createObjectURL(e.target.files[0]);
+            setPreview(src)
+            setData('thumbnail', e.target.files[0])
+        }
+    }
     const submit = (e) => {
         e.preventDefault();
-       
-        patch(route('profile.update'));
+
+        post(route('profile.update'));
     };
 
     return (
@@ -30,6 +41,20 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
+                <div>
+                    <InputLabel htmlFor="avatar" value="avatar" />
+                    <FileInput
+                        id="thumbnail"
+                        htmlFor="thumbnail"
+                        className="w-32 rounded-full"
+                        name="thumbnail"
+                        value={preview}
+                        accept="image/*"
+                        autoComplete="username"
+                        onChange={uploadThumbnail}
+                    />
+                    <InputError message={errors.thumbnail} className="mt-2" />
+                </div>
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 

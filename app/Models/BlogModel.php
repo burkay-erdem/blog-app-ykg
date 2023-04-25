@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BlogModel extends Model
 {
@@ -12,8 +13,10 @@ class BlogModel extends Model
     protected $primaryKey = 'blog_id';
     protected $table = 'blogs';
 
-    protected $fillable = [ 
+    protected $fillable = [
         'tag',
+        'user_id',
+        'thumbnail',
         'title',
         'content',
         'date_start',
@@ -22,5 +25,9 @@ class BlogModel extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    public function comments(): HasMany
+    {
+        return $this->hasMany(CommentModel::class, 'blog_id');
     }
 }

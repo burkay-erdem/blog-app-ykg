@@ -22,6 +22,7 @@ export default function Form({ auth, blog }) {
         date_start: blog?.date_start ?? '',
         date_end: blog?.date_end ?? '',
     });
+    const [preview, setPreview] = useState(blog?.thumbnail ?? '',);
 
     const _contentState = ContentState.createFromText(data.content);
     const raw = convertToRaw(_contentState);  // RawDraftContentState JSON
@@ -37,13 +38,18 @@ export default function Form({ auth, blog }) {
     const uploadThumbnail = (e) => {
         if (e.target.files.length > 0) {
             const src = URL.createObjectURL(e.target.files[0]);
-            setData('thumbnail', src)
+            setPreview(src)
+            setData('thumbnail', e.target.files[0])
         }
     }
     const submit = (e) => {
         e.preventDefault();
+        console.log('data : ', data)
         if (blog) {
-            put(route('blog.update', { id: blog.blog_id }), {
+            post(route('blog.update', {
+                preserveScroll: true,
+                id: blog.blog_id
+            }), {
                 onSuccess: () => reset(),
                 onError: (errors) => {
                     console.log('errors: ', errors);
@@ -61,18 +67,31 @@ export default function Form({ auth, blog }) {
         >
             <Head title="Blog Form" />
             <div className="flex flex-col bg-white px-8 py-6 max-w-6xl mt-3 mx-auto rounded-lg shadow-md">
-                <form onSubmit={submit}>
+                <form name='blogForm' onSubmit={submit}>
                     <div className='my-4 '>
+                        <InputLabel htmlFor="thumbnail" value="thumbnail" />
                         <FileInput
                             id="thumbnail"
                             htmlFor="thumbnail"
                             name="thumbnail"
-                            value={data.thumbnail}
+                            value={preview}
                             accept="image/*"
                             autoComplete="username"
                             onChange={uploadThumbnail}
                         />
                         <InputError message={errors.thumbnail} className="mt-2" />
+                    </div>
+                    <div className='my-4'>
+                        <InputLabel htmlFor="tag" value="tag" />
+                        <TextInput
+                            id="tag"
+                            type="text"
+                            name="tag"
+                            value={data.tag}
+                            className="mt-1 block w-full"
+                            onChange={(e) => setData('tag', e.target.value)}
+                        />
+                        <InputError message={errors.tag} className="mt-2" />
                     </div>
                     <div className='my-4'>
                         <InputLabel htmlFor="title" value="title" />

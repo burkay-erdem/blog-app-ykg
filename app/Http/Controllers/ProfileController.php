@@ -30,7 +30,23 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        
+        $fillData = $request->validated();
+        if ($request->hasFile('thumbnail')) {
+            $file = $request->file('thumbnail');
+            $fileName = time() . '.' . $file->extension();
+
+            $file->move(public_path('uploads'), $fileName);
+            $url = '/uploads/' . $fileName;
+            $fillData['thumbnail'] = $url;
+
+
+            $path = public_path() . $request->user()->thumbnail;
+            if (file_exists($path) && $request->user()->thumbnail) {
+                unlink($path);
+            }
+        }
+        $request->user()->fill($fillData);
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;

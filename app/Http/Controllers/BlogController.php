@@ -6,6 +6,7 @@ use App\Models\BlogModel;
 use App\Http\Requests\StoreBlogRequest;
 use App\Http\Requests\UpdateBlogRequest;
 use App\Http\Resources\BlogResource;
+use App\Models\CommentModel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,8 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class BlogController extends Controller
 {
@@ -22,6 +25,7 @@ class BlogController extends Controller
     {
         $blogs =  BlogModel::query()
             ->with('user')
+            ->orderBy('created_at', 'desc')
             ->paginate($this->pagination_limit);
 
         return Inertia::render('Welcome', [
@@ -32,8 +36,9 @@ class BlogController extends Controller
 
     public function index(Request $request): Response
     {
-        $blogs =  BlogModel::where('user_id', $request->user()->user_id)->paginate($this->pagination_limit);
-
+        $blogs =  BlogModel::where('user_id', $request->user()->user_id)
+            ->orderBy('created_at', 'desc')
+            ->paginate($this->pagination_limit);
 
         return Inertia::render('Blog/List', [
             'status' => session('status'),
@@ -46,7 +51,7 @@ class BlogController extends Controller
     public function create(): Response
     {
         return Inertia::render('Blog/Form', [
-            'status' => session('status'), 
+            'status' => session('status'),
         ]);
     }
 
@@ -55,19 +60,27 @@ class BlogController extends Controller
      */
     public function store(StoreBlogRequest $request): RedirectResponse
     {
+        Validator::make($request->all(), [
+            'title' => ['required'],
+            'content' => ['required'],
+            'tag' => ['required'],
+            'thumbnail' => ['required'],
+        ])->validate();
 
-        $request->validate([
-            'title' => 'required',
-            'content' => 'required', 
-        ]);
-        $insert_data = [
+        $insertData = [
             ...$request->post(),
             'user_id' => $request->user()->user_id
         ];
-       
-        BlogModel::create($insert_data);
+        if ($request->hasFile('thumbnail')) {
+            $file = $request->file('thumbnail');
+            $fileName = time() . '.' . $file->extension();
+
+            $file->move(public_path('uploads'), $fileName);
+            $url = '/uploads/' . $fileName;
+            $insertData['thumbnail'] = $url;
+        }
+        BlogModel::create($insertData);
         return Redirect::route('blog.index');
-     
     }
 
     /**
@@ -75,7 +88,12 @@ class BlogController extends Controller
      */
     public function show(Request $request): Response
     {
-        $blog = BlogModel::where('blog_id', $request->get('blog_id'))->with('user')->first();
+        $blog = BlogModel::where('blog_id', $request->get('blog_id'))
+        ->with('user')
+        ->with(['comments' => function ($q) {
+            $q->with('user')->orderBy('created_at','desc');
+        }])
+        ->first();
 
         return Inertia::render('Blog/Detail', [
             'status' => session('status'),
@@ -100,14 +118,31 @@ class BlogController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBlogRequest $request, BlogModel $blog): RedirectResponse
-    {  
-        $request->validate([
-            'title' => 'required',
-            'content' => 'required', 
-        ]);
-       
-        $blog->fill($request->post())->save();
+    public function update(StoreBlogRequest $request, BlogModel $blog): RedirectResponse
+    {
+        Validator::make($request->all(), [
+            'title' => ['required'],
+            'content' => ['required'],
+            'tag' => ['required'],
+            'thumbnail' => ['required'],
+        ])->validate();
+
+        $updateData = $request->post();
+        if ($request->hasFile('thumbnail')) {
+            $file = $request->file('thumbnail');
+            $fileName = time() . '.' . $file->extension();
+
+            $file->move(public_path('uploads'), $fileName);
+            $url = '/uploads/' . $fileName;
+            $updateData['thumbnail'] = $url;
+
+            $path = public_path() . $blog->thumbnail;
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+
+        $blog->fill($updateData)->save();
         return Redirect::route('blog.index');
     }
 
@@ -124,5 +159,18 @@ class BlogController extends Controller
         $blog->delete();
 
         return Redirect::route('blog.index');
+    }
+
+
+    public function comment(Request $request): RedirectResponse
+    {
+        Validator::make($request->post(), [
+            'comment' => ['required'],
+            'user_id' => ['required'],
+            'blog_id' => ['required'],
+        ])->validate();
+
+        CommentModel::create($request->post());
+        return Redirect::route('blog.detail',['blog_id' => $request->post('blog_id')]);
     }
 }

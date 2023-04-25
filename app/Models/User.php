@@ -18,10 +18,11 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [ 
+    protected $fillable = [
         'name',
         'email',
         'password',
+        'thumbnail'
     ];
 
     /**
@@ -46,6 +47,6 @@ class User extends Authenticatable
 
     public function blogs(): HasMany
     {
-        return $this->hasMany(BlogModel::class);
+        return $this->hasMany(BlogModel::class, 'user_id');
     }
 }

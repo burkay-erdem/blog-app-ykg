@@ -121,6 +121,10 @@ export default function Authenticated({ user, header, children }) {
             )}
 
             <main>{children}</main>
+
+            <footer className='py-12'>
+
+            </footer>
         </div>
     );
 }

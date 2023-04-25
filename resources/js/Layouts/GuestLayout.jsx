@@ -4,7 +4,7 @@ import NavLink from '@/Components/NavLink';
 
 export default function Guest({ children, header }) {
     const Layout = route().current('user.*') ? FormLayout : DashboardLayout
-  
+
     return (
         <div className="min-h-screen bg-gray-100">
             <nav className="bg-white border-b border-gray-100">
@@ -59,6 +59,10 @@ const FormLayout = ({ children }) => {
             <div className="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 {children}
             </div>
+
+            <footer className='py-12'>
+
+            </footer>
         </div>
     )
 }
