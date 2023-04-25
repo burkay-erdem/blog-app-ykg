@@ -4,8 +4,9 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link } from '@inertiajs/react';
+import RenderWhen from '@/Components/RenderWhen';
 
-export default function Authenticated({ user, header, children }) {
+export default function Authenticated({ user, header, children, isAdmin }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
@@ -25,6 +26,17 @@ export default function Authenticated({ user, header, children }) {
                                     Blogs
                                 </NavLink>
                             </div>
+                            <RenderWhen condition={isAdmin} >
+                                {
+                                    () => (
+                                        <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                                            <NavLink href={route('user.list')} active={route().current('/')}>
+                                                User list
+                                            </NavLink>
+                                        </div>
+                                    )
+                                }
+                            </RenderWhen>
                         </div>
 
                         <div className="hidden sm:flex sm:items-center sm:ml-6">

@@ -21,12 +21,10 @@ use Illuminate\Support\Facades\Validator;
 class BlogController extends Controller
 {
     private $pagination_limit = 5;
-
-
-    protected function permissions($permitionName): bool
+    protected function permissions($permissionName): bool
     {
-        if (Auth::user()) {
-            return Auth::user()->hasPermissionTo($permitionName);
+        if (Auth::check()) {
+            return Auth::user()->hasPermissionTo($permissionName);
         }
         return false;
     }

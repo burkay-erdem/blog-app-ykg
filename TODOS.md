@@ -14,10 +14,10 @@
 
 [x] - blog yazılarına yorum ekleyebilme
 
-[x] - blog yazılarını beğenebilecek
+[x] - blog yazılarını beğeneme
 
 [x] - admin ve blogger olarak iki rol oluşturulması
 
-[x] - Admini tüm blagları silebilme yetkisi
+[x] - Adminin tüm blagları silebilme yetkisi
 
 [] - Kullanıcı engelleme işlemi

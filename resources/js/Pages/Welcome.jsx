@@ -10,6 +10,7 @@ export default function Welcome({ auth, blogs, isAdmin, isBlogger }) {
                 {
                     () => (
                         <AuthenticatedLayout
+                            isAdmin={isAdmin}
                             user={auth.user}
                             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Blogs</h2>}
                         >
@@ -33,9 +34,7 @@ export default function Welcome({ auth, blogs, isAdmin, isBlogger }) {
                                         </div>
                                         <div className="mt-6" v-for="post in posts" >
                                         </div>
-                                        <div className="mt-8">
-                                            <pagination />
-                                        </div>
+                                      
                                     </div>
                                 </div>
                             </div>
